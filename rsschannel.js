@@ -3,6 +3,10 @@
 const FeedParser = require('feedparser');
 const request = require('request');
 const LRU = require('lru-cache'); 
+const log4js = require('log4js');
+
+const logger = log4js.getLogger('rss');
+
 
 class RSSChannel {
   constructor(url, handleNew) {
@@ -17,12 +21,14 @@ class RSSChannel {
     const feedparser = new FeedParser({});
     let newItems = [];
     req.on('error', (error) => {
+        logger.error(`Request error ${channel.url}: ${error}`)
     });
         
     req.on('response', (res) => {
         const stream = req;        
         if (res.statusCode !== 200) {
             stream.emit('error', new Error('Bad status code'));
+            logger.error(`Feedparder ${channel.url}: Bad status code`)
         }
         else {
             stream.pipe(feedparser);
@@ -30,6 +36,7 @@ class RSSChannel {
     });
         
     feedparser.on('error', (error) => {
+        logger.error(`Feedparder ${channel.url}: ${error}`)
     });
         
     feedparser.on('readable', () => {
@@ -38,6 +45,7 @@ class RSSChannel {
 
         while (item = stream.read()) {
             if(!this.cache.get(item.guid)) {
+                logger.info("New item: " + item.guid)
                 newItems.push(item);
                 this.cache.set(item.guid, item.link);
             }
