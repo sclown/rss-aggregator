@@ -37,7 +37,9 @@ class TGChannel {
 
     processItems(items) {
         items.forEach((item) => { 
-            // bot.sendMessage(this.reciever, `[${item.title}](${item.link})`,{parse_mode : "Markdown"});
+            const message = `[${item.title}](${item.link})`
+            logger.info(`${this.reciever} message: ${message}`);
+            bot.sendMessage(this.reciever, message,{parse_mode : "Markdown"});
         });
         this.index+=1;
         if(this.index>=this.channels.length) {
