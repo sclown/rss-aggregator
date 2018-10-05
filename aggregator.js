@@ -41,19 +41,23 @@ class TGChannel {
             logger.info(`${this.reciever} message: ${message}`);
             bot.sendMessage(this.reciever, message,{parse_mode : "Markdown"});
         });
-        this.index+=1;
-        if(this.index>=this.channels.length) {
-            this.index = 0;
-        }
     }
 
     checkNews() {
         logger.info(this.reciever + " Check news for " + this.channels[this.index].url);
         const that = this
         this.channels[this.index].getNews((items)=>{ that.processItems(items) });
+        this.switchToNextChannel()
         setTimeout(() => {
             that.checkNews();
         }, config.timeout);
+    }
+
+    switchToNextChannel() {
+        this.index+=1;
+        if(this.index>=this.channels.length) {
+            this.index = 0;
+        }
     }
 
 }  
