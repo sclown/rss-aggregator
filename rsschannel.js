@@ -2,6 +2,7 @@
 
 const FeedParser = require('feedparser');
 const request = require('request');
+const URL = require('url');
 const LRU = require('lru-cache'); 
 const log4js = require('log4js');
 
@@ -11,8 +12,18 @@ const logger = log4js.getLogger('rss');
 class RSSChannel {
   constructor(url, handleNew) {
     this.url = url;
-    this.cache = LRU(1000)
-    this.getNews()
+    this.hostURL = this.getHostURL(url);
+    this.cache = LRU(1000);
+    this.getNews();
+  }
+
+  getHostURL(urlString) {
+    const parsedURL = URL.parse(urlString);
+    if(!parsedURL){
+        return "";
+    }
+    return `${parsedURL.protocol}//${parsedURL.hostname}`;
+
   }
 
   getNews(handler) {
@@ -45,7 +56,10 @@ class RSSChannel {
 
         while (item = stream.read()) {
             if(!this.cache.get(item.guid)) {
-                logger.info("New item: " + item.guid)
+                logger.info("New item: " + item.guid);
+                if(item.link && item.link.startsWith("/")) {
+                    item.link = this.hostURL + item.link;
+                }
                 newItems.push(item);
                 this.cache.set(item.guid, item.link);
             }

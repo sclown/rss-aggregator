@@ -25,19 +25,21 @@ const bot = new TelegramBot(config.token);
 class TGChannel {
     constructor(channel, feeds) {
         this.index = 0;
-        this.reciever = channel
-        this.channels = []
+        this.reciever = channel;
+        this.channels = [];
         feeds.forEach( (url) => { 
             this.channels.push( new RSSChannel(url) ); 
         });    
         if( this.channels.length > 0 ) {
-            this.checkNews();
+            setTimeout(() => {
+                that.checkNews();
+            }, config.timeout);
         }
     }
 
     processItems(items) {
         items.forEach((item) => { 
-            const message = `[${item.title}](${item.link})`
+            const message = `[${item.title}](${item.link})`;
             logger.info(`${this.reciever} message: ${message}`);
             bot.sendMessage(this.reciever, message,{parse_mode : "Markdown"});
         });
@@ -45,9 +47,9 @@ class TGChannel {
 
     checkNews() {
         logger.info(this.reciever + " Check news for " + this.channels[this.index].url);
-        const that = this
+        const that = this;
         this.channels[this.index].getNews((items)=>{ that.processItems(items) });
-        this.switchToNextChannel()
+        this.switchToNextChannel();
         setTimeout(() => {
             that.checkNews();
         }, config.timeout);
