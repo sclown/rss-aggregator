@@ -32,14 +32,14 @@ class RSSChannel {
     const feedparser = new FeedParser({});
     let newItems = [];
     req.on('error', (error) => {
-        logger.error(`Request error ${channel.url}: ${error}`)
+        logger.error(`Request error ${channel.url}: ${error}`);
     });
         
     req.on('response', (res) => {
         const stream = req;        
         if (res.statusCode !== 200) {
             stream.emit('error', new Error('Bad status code'));
-            logger.error(`Feedparder ${channel.url}: Bad status code`)
+            logger.error(`Feedparder ${channel.url}: Bad status code`);
         }
         else {
             stream.pipe(feedparser);
@@ -47,7 +47,7 @@ class RSSChannel {
     });
         
     feedparser.on('error', (error) => {
-        logger.error(`Feedparder ${channel.url}: ${error}`)
+        logger.error(`Feedparder ${channel.url}: ${error}`);
     });
         
     feedparser.on('readable', () => {
@@ -74,5 +74,5 @@ class RSSChannel {
   }
 }
 
-module.exports = RSSChannel
+module.exports = RSSChannel;
 

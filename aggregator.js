@@ -19,6 +19,7 @@ const logger = log4js.getLogger();
 
 const fs = require('fs');
 
+logger.info("Launching bot");
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 const bot = new TelegramBot(config.token);
@@ -31,6 +32,7 @@ class TGChannel {
             this.channels.push( new RSSChannel(url) ); 
         });    
         if( this.channels.length > 0 ) {
+            const that = this;
             setTimeout(() => {
                 that.checkNews();
             }, config.timeout);
@@ -64,6 +66,7 @@ class TGChannel {
 
 }  
 
+logger.info("Load channels from config");
 const channels = [];
 config.tgchannels.forEach( (ch) => { 
     channels.push( new TGChannel(ch.channel, ch.feeds) ); 
