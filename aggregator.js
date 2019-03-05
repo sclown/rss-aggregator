@@ -82,10 +82,10 @@ config.tgchannels.forEach( (ch) => {
 
 try {
     const savedReaders = JSON.parse(fs.readFileSync('readers.json', 'utf8'));
-    savedReaders.filter( reader => !findReceiver(reader.chatID) ).forEach( reader => {
+    savedReaders.filter( reader => !findReceiver(reader.chatid) ).forEach( reader => {
         const channels = config.tgchannels.filter( ch => reader.themes.includes(ch.channel) );
         channels.forEach( ch => { 
-            channels.push( new TGChannel(reader.chatID, ch.feeds) );
+            channels.push( new TGChannel(reader.chatid, ch.feeds) );
         });
         readers.push(reader); 
     
@@ -126,7 +126,7 @@ function addReader(chat, themes) {
     if( channels.length ) {
         let reader = { chatid: chat.id, title: chat.title, themes: themes };
         channels.forEach( ch => { 
-            channels.push( new TGChannel(reader.chatID, ch.feeds) ); 
+            channels.push( new TGChannel(reader.chatid, ch.feeds) ); 
         });
         readers.push(reader);
         fs.writeFileSync('readers.json', JSON.stringify(readers), 'utf8');            
