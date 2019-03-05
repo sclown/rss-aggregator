@@ -71,10 +71,10 @@ logger.info("Load channels from config");
 const readers = [];
 const channels = [];
 config.tgchannels.forEach( (ch) => {
-    bot.getChat(ch.channel).then( (chat) => {
+    ch.channel && ch.theme && bot.getChat(ch.channel).then( (chat) => {
         if(!findReceiver(chat.id)) {
             channels.push( new TGChannel(chat.id, ch.feeds) ); 
-            readers.push({ chatid: chat.id, title: chat.title, themes: [ch.channel] });
+            readers.push({ chatid: chat.id, title: chat.title, themes: [ch.theme] });
             fs.writeFileSync('readers.json', JSON.stringify(readers), 'utf8');                
         }
     });
@@ -83,7 +83,7 @@ config.tgchannels.forEach( (ch) => {
 try {
     const savedReaders = JSON.parse(fs.readFileSync('readers.json', 'utf8'));
     savedReaders.filter( reader => !findReceiver(reader.chatid) ).forEach( reader => {
-        const channels = config.tgchannels.filter( ch => reader.themes.includes(ch.channel) );
+        const channels = config.tgchannels.filter( ch => reader.themes.includes(ch.theme) );
         channels.forEach( ch => { 
             channels.push( new TGChannel(reader.chatid, ch.feeds) );
         });
@@ -122,7 +122,7 @@ function findReceiver(receiver) {
 }
 
 function addReader(chat, themes) {
-    const channels = config.tgchannels.filter( ch => themes.includes(ch.channel) );
+    const channels = config.tgchannels.filter( ch => themes.includes(ch.theme) );
     if( channels.length ) {
         let reader = { chatid: chat.id, title: chat.title, themes: themes };
         channels.forEach( ch => { 
